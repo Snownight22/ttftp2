@@ -21,6 +21,7 @@ static stFtpCmd g_ctrl_commands[] =
     {"cd", "CWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
     {"lpwd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
     {"lcd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
+    {"lls", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
     {"mkdir", "MKD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
     {"rename", "RNFR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
     {"rename", "RNTO", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 1, 0, 1, 0, NULL, NULL},
@@ -391,6 +392,24 @@ int ftp_ctrl_localcmd(stFtpContext *context)
     {
         context->ispassive = 1;
         fprintf(stdout, "Passive Mode\n");
+    }
+    else if (!strcmp(context->currentCmd->command, "lpwd"))
+    {
+        char path[128] = {0};
+        getcwd(path, 127);
+        fprintf(stdout, "current dir:%s\n", path);
+    }
+    else if (!strcmp(context->currentCmd->command, "lcd"))
+    {
+        char command[128] = {0};
+        if (NULL != context->args)
+            snprintf(command, 127, "%s", context->args);
+        chdir(command);
+        fprintf(stdout, "change to dir:%s\n", command);
+    }
+    else if (!strcmp(context->currentCmd->command, "lls"))
+    {
+        system("ls");
     }
 
     return FTP_OK;
