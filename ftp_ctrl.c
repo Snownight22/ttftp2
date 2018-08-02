@@ -16,6 +16,14 @@ static stFtpCmd g_ctrl_commands[] =
     {"ls", "LIST", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 0, 0, 0, 1, 1, 0, NULL, NULL},
     {"passive", "PASV", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL},
     {"get", "RETR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 1, 0, 0, 1, 1, 1, NULL, NULL},
+    {"noop", "noop", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, NULL, NULL},
+    {"pwd", "PWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, NULL, NULL},
+    {"cd", "CWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
+    {"lpwd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
+    {"lcd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
+    {"mkdir", "MKD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
+    {"rename", "RNFR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
+    {"rename", "RNTO", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 1, 0, 1, 0, NULL, NULL},
 };
 
 static stFtpContext *g_ftp_context;
@@ -295,9 +303,7 @@ void ftp_ctrl_reply(const void *handler, const void *data, const int length)
                 ftp_ctrl_dataserver_destory(g_ftp_context);
         }
 
-        pthread_mutex_lock(&g_ftp_context->lock);
-        pthread_cond_signal(&g_ftp_context->cond);
-        pthread_mutex_unlock(&g_ftp_context->lock);
+        ftp_ctrl_notice();
     }
 }
 
@@ -356,8 +362,9 @@ int ftp_ctrl_command_logic(stFtpContext *context)
             LOG_ERROR("\nInput command error:%s\n", context->currentCmd->command);
             return FTP_ERR;
         }
-        if (context->currentCmd->hasarg)
+        if (context->currentCmd->hasarg && (NULL != context->args && (context->argnums > context->currentCmd->argindex)))
         {
+            snprintf(command, 127, "%s %s\r\n", context->currentCmd->ftpcommand, context->args + context->currentCmd->argindex * 128);
         }
         else
             snprintf(command, 127, "%s\r\n", context->currentCmd->ftpcommand);
