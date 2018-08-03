@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include "ftp_err.h"
 
+//ftp.gnu.org
+//mirrors.ustc.edu.cn
+
 int main(int argc, char *argv[])
 {
 

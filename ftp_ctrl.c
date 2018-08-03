@@ -22,6 +22,7 @@ static stFtpCmd g_ctrl_commands[] =
     {"lpwd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
     {"lcd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
     {"lls", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
+    {"close", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
     {"mkdir", "MKD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
     {"rename", "RNFR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
     {"rename", "RNTO", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 1, 0, 1, 0, NULL, NULL},
@@ -112,6 +113,30 @@ void ftp_ctrl_context_destory(stFtpContext *ftpC)
     }
 }
 
+void ftp_ctrl_notice()
+{
+    pthread_mutex_lock(&g_ftp_context->lock);
+    pthread_cond_signal(&g_ftp_context->cond);
+    pthread_mutex_unlock(&g_ftp_context->lock);
+}
+
+void ftp_ctrl_close(stFtpContext *context)
+{
+    if (NULL != context->ctrlHandler)
+    {
+        tcp_client_destroy(context->ctrlHandler);
+        context->ctrlHandler = NULL;
+    }
+}
+
+void ftp_ctrl_close_callback(const void *handler)
+{
+    fprintf(stdout, "now server close the session!\n");
+    ftp_ctrl_close(g_ftp_context);
+    ftp_ctrl_notice();
+}
+
+
 void ftp_ctrl_data_reply(const void *handler, const void *data, const int length)
 {
     stFtpContext *context = g_ftp_context;
@@ -168,7 +193,7 @@ int ftp_ctrl_dataserver_destory(stFtpContext *context)
 
 int ftp_ctrl_dataclient_init(stFtpContext *context, char *sip, unsigned short sport)
 {
-    context->dataHandler = tcp_client_init(sip, sport, ftp_ctrl_data_reply);
+    context->dataHandler = tcp_client_init(sip, sport, ftp_ctrl_data_reply, NULL);
     if (NULL == context->dataHandler)
     {
         LOG_ERROR("client DataHandler init error\n");
@@ -219,13 +244,6 @@ int ftp_ctrl_passive_proc(stFtpContext *context, char *data)
     if (FTP_OK != ftp_ctrl_dataclient_init(context, fip, sport))
         return FTP_ERR;
     return FTP_OK;
-}
-
-void ftp_ctrl_notice()
-{
-    pthread_mutex_lock(&g_ftp_context->lock);
-    pthread_cond_signal(&g_ftp_context->cond);
-    pthread_mutex_unlock(&g_ftp_context->lock);
 }
 
 void ftp_ctrl_reply(const void *handler, const void *data, const int length)
@@ -312,8 +330,8 @@ int ftp_ctrl_passive(stFtpContext *context)
 {
     char *command = "PASV\r\n";
 
-    tcp_client_send(context->ctrlHandler, command, strlen(command));
-    LOG_INFO("command:%s\n", command);
+    int ret = tcp_client_send(context->ctrlHandler, command, strlen(command));
+    LOG_INFO("command:%s, send ret:%d\n", command, ret);
     return FTP_OK;
 }
 
@@ -328,8 +346,8 @@ int ftp_ctrl_positive(stFtpContext *context)
     if (FTP_OK != ret)
         return FTP_ERR;
     snprintf(command, 127, "PORT %u,%u,%u,%u,%u,%u\r\n", (unsigned int)(lip >> 24)&0xff, (unsigned int)(lip >> 16)&0xff, (unsigned int)(lip >> 8)&0xff, (unsigned int)(lip)&0xff, (lport >> 8)&0xff, lport & 0xff);
-    tcp_client_send(context->ctrlHandler, command, strlen(command));
-    LOG_INFO("command:%s\n", command);
+    ret = tcp_client_send(context->ctrlHandler, command, strlen(command));
+    LOG_INFO("command:%s, send ret:%d\n", command, ret);
 
     return FTP_OK;
 }
@@ -348,7 +366,7 @@ int ftp_ctrl_command_logic(stFtpContext *context)
         }
         if (context->port == 0)
             context->port = 21;
-        context->ctrlHandler = tcp_client_init(context->domain, context->port, ftp_ctrl_reply);
+        context->ctrlHandler = tcp_client_init(context->domain, context->port, ftp_ctrl_reply, ftp_ctrl_close_callback);
         if (NULL == context->ctrlHandler)
         {
             LOG_ERROR("ftp ctrl tunnel init error\n");
@@ -360,6 +378,7 @@ int ftp_ctrl_command_logic(stFtpContext *context)
     {
         if (NULL == context->ctrlHandler)
         {
+            fprintf(stdout, "please use open to connect the ftp server!\n");
             LOG_ERROR("\nInput command error:%s\n", context->currentCmd->command);
             return FTP_ERR;
         }
@@ -382,8 +401,14 @@ int ftp_ctrl_command_logic(stFtpContext *context)
             }
         }
         else
-            tcp_client_send(context->ctrlHandler, command, strlen(command));
+        {
+            int ret = tcp_client_send(context->ctrlHandler, command, strlen(command));
+            LOG_ERROR("tcp send ret:%d\n", ret);
+
+        }
     }
+
+    return FTP_OK;
 }
 
 int ftp_ctrl_localcmd(stFtpContext *context)
@@ -410,6 +435,10 @@ int ftp_ctrl_localcmd(stFtpContext *context)
     else if (!strcmp(context->currentCmd->command, "lls"))
     {
         system("ls");
+    }
+    else if (!strcmp(context->currentCmd->command, "close"))
+    {
+        ftp_ctrl_close(context);
     }
 
     return FTP_OK;
@@ -462,11 +491,13 @@ int ftp_ctrl_proc(char* domain, unsigned short port)
                 g_ftp_context->currentCmd = ctrl;
                 if (ctrl->isFtpCmd)
                 {
-                    ftp_ctrl_command_logic(g_ftp_context);
-                    pthread_mutex_lock(&g_ftp_context->lock);
-                    pthread_cond_wait(&g_ftp_context->cond, &g_ftp_context->lock);
-                    pthread_mutex_unlock(&g_ftp_context->lock);
-                    //fprintf(stdout, "signal receive\n");
+                    if (FTP_OK == ftp_ctrl_command_logic(g_ftp_context))
+                    {
+                        pthread_mutex_lock(&g_ftp_context->lock);
+                        pthread_cond_wait(&g_ftp_context->cond, &g_ftp_context->lock);
+                        pthread_mutex_unlock(&g_ftp_context->lock);
+                        //fprintf(stdout, "signal receive\n");
+                    }
                 }
                 else
                     ftp_ctrl_localcmd(g_ftp_context);
