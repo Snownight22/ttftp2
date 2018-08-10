@@ -30,6 +30,7 @@ typedef struct ftpCmd
     unsigned char usedata;
     unsigned char isFtpCmd;
     unsigned char saveData;
+    unsigned char upData;
     char* printBefore;
     char* printAfter;
     /*
@@ -51,6 +52,8 @@ typedef struct ftpContext
     char *args;
     void *ctrlHandler;
     void *dataHandler;
+    FILE *datafp;
+    void *dataClient;
     stFtpCmd *currentCmd;
     pthread_mutex_t lock;
     pthread_cond_t cond;

@@ -8,24 +8,26 @@
 
 static stFtpCmd g_ctrl_commands[] = 
 {
-    {"open", NULL, FTP_REPLY_FLAG_TWO, 0, 0, FTP_REPLY_FLAG_TWO, 1, 0, 0, 0, 0, 1, 0, NULL, NULL},
-    {"user", "USER", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 1, 0, 0, 1, 0,"Name (192.168.1.186: anonymous as default):", NULL},
-    {"password", "PASS", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 1, 0, 0, 1, 0, "Password:", NULL},
-    {"account", "ACCT", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
-    {"system", "SYST", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, NULL, NULL},
-    {"ls", "LIST", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 0, 0, 0, 1, 1, 0, NULL, NULL},
-    {"passive", "PASV", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL},
-    {"get", "RETR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 1, 0, 0, 1, 1, 1, NULL, NULL},
-    {"noop", "noop", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, NULL, NULL},
-    {"pwd", "PWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, NULL, NULL},
-    {"cd", "CWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
-    {"lpwd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
-    {"lcd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
-    {"lls", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
-    {"close", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, NULL, NULL},
-    {"mkdir", "MKD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
-    {"rename", "RNFR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 0, 0, 0, 1, 0, NULL, NULL},
-    {"rename", "RNTO", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 1, 0, 1, 0, NULL, NULL},
+    {"open", NULL, FTP_REPLY_FLAG_TWO, 0, 0, FTP_REPLY_FLAG_TWO, 1, 0, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"user", "USER", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 1, 0, 0, 1, 0, 0, "Name (192.168.1.186: anonymous as default):", NULL},
+    {"password", "PASS", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 1, 0, 0, 1, 0, 0, "Password:", NULL},
+    {"account", "ACCT", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"system", "SYST", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"ls", "LIST", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 0, 0, 0, 1, 1, 0, 0, NULL, NULL},
+    {"passive", "PASV", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL},
+    {"get", "RETR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 1, 0, 0, 1, 1, 1, 0, NULL, NULL},
+    {"noop", "noop", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"pwd", "PWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"cd", "CWD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"lpwd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, NULL, NULL},
+    {"lcd", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, NULL, NULL},
+    {"lls", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, NULL, NULL},
+    {"close", "", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, NULL, NULL},
+    {"mkdir", "MKD", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"rename", "RNFR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, FTP_REPLY_FLAG_THREE, 0, 1, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"rename", "RNTO", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, NULL, NULL},
+    {"binary", "TYPE I", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, NULL, NULL},
+    {"put", "STOR", FTP_REPLY_FLAG_TWO, FTP_REPLY_FLAG_FAIL, FTP_REPLY_FLAG_ONE, 0, 0, 1, 0, 0, 1, 1, 0, 1, NULL, NULL},
 };
 
 static stFtpContext *g_ftp_context;
@@ -94,6 +96,10 @@ stFtpContext* ftp_ctrl_context_init(char* domain, unsigned short port)
     if (port == 0)
         ftpC->port = 21;
     //ftpC->port = port;
+    ftpC->datafp = NULL;
+    ftpC->ctrlHandler = NULL;
+    ftpC->dataHandler = NULL;
+    ftpC->dataClient = NULL;
     pthread_mutex_init(&ftpC->lock, NULL);
     pthread_cond_init(&ftpC->cond, NULL);
 
@@ -145,16 +151,17 @@ void ftp_ctrl_data_reply(const void *handler, const void *data, const int length
 
     if (cmd->saveData)
     {
-        FILE *fp;
-        strcpy(fileName, context->args + cmd->argindex * 128);
-        fp = fopen(fileName, "wb");
-        if (NULL == fp)
+        if (NULL == context->datafp)
         {
-            LOG_ERROR("can't save file, open error\n");
-            return ;
+            strcpy(fileName, context->args + cmd->argindex * 128);
+            context->datafp = fopen(fileName, "wb");
+            if (NULL == context->datafp)
+            {
+                LOG_ERROR("can't save file, open error\n");
+                return ;
+            }
         }
-        fwrite(data, length, 1, fp);
-        fclose(fp);
+        fwrite(data, length, 1, context->datafp);
     }
     else
         fprintf(stdout, "%s\n", data);
@@ -170,9 +177,16 @@ int ftp_ctrl_getlocalinfo(stFtpContext *context, long *lip, unsigned short *lpor
     return FTP_OK;
 }
 
+void ftp_ctrl_dataserver_accept(const void *clientInfo)
+{
+    //if (NULL != g_ftp_context->dataClient)
+        //tcp_server_remove_client(g_ftp_context->dataHandler, g_ftp_context->dataClient);
+    g_ftp_context->dataClient = (void *)clientInfo;
+}
+
 int ftp_ctrl_dataserver_init(stFtpContext *context, long *lip, unsigned short *lport)
 {
-    context->dataHandler = tcp_server_init(NULL, 0, ftp_ctrl_data_reply, NULL);
+    context->dataHandler = tcp_server_init(NULL, 0, ftp_ctrl_data_reply, ftp_ctrl_dataserver_accept);
     if (NULL == context->dataHandler)
         return FTP_ERR;
     ftp_ctrl_getlocalinfo(context, lip, lport);
@@ -246,6 +260,41 @@ int ftp_ctrl_passive_proc(stFtpContext *context, char *data)
     return FTP_OK;
 }
 
+int ftp_ctrl_upload_data(stFtpContext *context, char *fileName)
+{
+    FILE *fp;
+    char buff[1024];
+    int readlen;
+
+    if (NULL == (fp = fopen(fileName, "rb")))
+    {
+        fprintf(stderr, "ReadFile error\n");
+        return FTP_ERR;
+    }
+
+    while (!feof(fp))
+    {
+        readlen = fread(buff, sizeof(char), 1024, fp);
+        //LOG_INFO("upload data read:%d\n", readlen);
+        if (0 != readlen)
+        {
+            if (context->ispassive)
+                tcp_client_send(context->dataHandler, buff, readlen);
+            else
+                tcp_server_send(context->dataClient, buff, readlen);
+        }
+    }
+
+    fclose(fp);
+
+    if (context->ispassive)
+        ftp_ctrl_dataclient_destroy(g_ftp_context);
+    else
+        ftp_ctrl_dataserver_destory(g_ftp_context);
+
+    return FTP_OK;
+}
+
 void ftp_ctrl_reply(const void *handler, const void *data, const int length)
 {
     int errorcode = 400;
@@ -289,6 +338,11 @@ void ftp_ctrl_reply(const void *handler, const void *data, const int length)
         tcp_client_send(g_ftp_context->ctrlHandler, command, strlen(command));
         return ;
     }
+    else if (cmd->usedata && (1 == g_ftp_context->finishpasv))
+    {
+        if (NULL != g_ftp_context->datafp)
+            close(g_ftp_context->datafp);
+    }
 
     if ((cmd->nextcommandflag & (0x1 << code)) != 0)
     {
@@ -314,7 +368,7 @@ void ftp_ctrl_reply(const void *handler, const void *data, const int length)
     }
     else if (((cmd->successflag & (0x1 << code)) != 0) || ((cmd->failflag & (0x1 << code)) != 0))
     {
-        if (cmd->usedata)
+        if (cmd->usedata && (!cmd->upData))
         {
             if (g_ftp_context->ispassive)
                 ftp_ctrl_dataclient_destroy(g_ftp_context);
@@ -323,6 +377,16 @@ void ftp_ctrl_reply(const void *handler, const void *data, const int length)
         }
 
         ftp_ctrl_notice();
+    }
+    else if ((cmd->waitflag & (0x1 << code)) != 0)
+    {
+        if (cmd->usedata && cmd->upData && g_ftp_context->finishpasv == 1)
+        {
+            if (cmd->hasarg)
+                strcpy(arg, g_ftp_context->args + cmd->argindex * 128);
+            ftp_ctrl_upload_data(g_ftp_context, arg);
+        }
+
     }
 }
 
